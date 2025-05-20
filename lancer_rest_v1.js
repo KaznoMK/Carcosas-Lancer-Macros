@@ -89,20 +89,13 @@ async function openPilotWindow(pilot) {
         // Reinitialization form if destroyed
     if (isDestroyed) {
         let totalAvailableRepairs = repairsValue + alliedRepairs;
-        let repairsRequired = 4 - alliedRepairs;
+        let repairsRequired = Math.max(0, 4 - repairsValue - alliedRepairs);
         
         let reinitContent = `
             <div style="display: block; background-color: var(--background-color); padding: 5px; border-radius: 5px;">
                 <span class="lancer-header lancer-primary card clipped" style="font-size: 18px; text-align: center; padding: 5px 0; margin-top: 15px;">
                     <strong>EMERGENCY RECOVERY MENU::</strong> ${mech.name}
-                </span>
-                
-                <!-- Repairs Box -->
-                <div style="background-color: var(--primary-color); color: white; font-size: 36px; padding: 10px; display: flex; align-content: center; margin-top: 15px; margin-left: 10px; max-width: 160px; max-height: 60px; justify-content: space-between; border-radius: 5px;" title="Repairs Available / Repair Capacity">
-                    <img src="${repairIcon}" style="width: 36px; margin-right: 10px; border: none; overflow: hidden; transform: scale(1.8);">
-                    <div style="align-content: center;">${repairsValue} / ${maxRepairs}</div>
-                </div>
-                
+                </span>             
 
                 <!-- Warning Icon and Message -->
                 <div style="text-align: center; margin: 5px 0;">
@@ -121,32 +114,68 @@ async function openPilotWindow(pilot) {
                                 <i class="mdi mdi-radioactive" style="font-size: 44px; color: #e74210; position: absolute; top: 57%; left: 50%; transform: translate(-50%, -50%); rotate(180deg);"></i>
                             </div>` : ""}
                     </div>
+                  </div>
+
+                <!-- Repairs Box -->
+                <div style="display: flex; justify-content: center; margin-top: 15px;">
+                <div style="background-color: var(--primary-color); color: white; font-size: 20px; padding: 10px; display: flex; justify-content: space-between; align-items: center; max-width: 200px; max-height: 50px; border-radius: 5px;" title="Repairs Available / Repair Capacity">
+                    <img src="${repairIcon}" style="width: 20px; margin-right: 20px; border: none; overflow: hidden; transform: scale(1.8);">
+                    <div>${repairsValue} / ${maxRepairs}</div>
+                </div>
                 </div>
 
                 <!-- Repair Requirements -->
-                        <div class="card clipped" style="color: white; margin-right: 10px; margin-left: 10px; margin-top: 15px;">
-                            <div class="lancer-mini-header" style="display: flex; align-items: center; justify-content: center; height: 28px; font-size:16px;"><strong>REINIT::</strong>
-                            </div>
-                            <div class="lancer-hit" style="justify-content: left; display: flex; flex-direction: column; background-color: var(--darken-2); margin-top: 0px; margin-left: 0px; margin-right: 0px; padding: 7px 7px;">
-                                <div style="display: flex-column; align-items: center; justify-content: center; color: white; font-size: 18px; margin: 5px 0;">Chassis recovery requires 4 repairs.<br>
-                                    <button id="refreshAlliedRepairs" class="lancer-button lancer-secondary" style="padding: 2px 2px; font-size: 18px; max-width: 30px; margin: 5px;">
-                                        <i class="mdi mdi-refresh" style="margin-left: 3px;"></i>
-                                    </button>
-                                    <span id="alliedRepairsCount">${alliedRepairs}</span>&nbsp;Allied Repairs Detected.
-                                </div>
-                                    <div style="display: flex; align-items: center; justify-content: center; color: white; font-size: 18px;">
-                                        <div id="repairsRequiredCount">${repairsRequired}</div>&nbsp;Additional Repair(s) required.<br>
+                <div class="card clipped" style="color: white; margin: 25px 10px 10px 10px ;">
+                    <div class="lancer-mini-header" style="display: flex; align-items: center; justify-content: center; height: 28px; font-size:16px;">
+                        <strong>REINIT::</strong>
+                    </div>
+
+                    <div class="lancer-hit" style="background-color: var(--darken-2); padding: 10px 10px; display: flex; flex-direction: column; margin: 0 0 0 0; align-items: center;">
+
+                    <div style="height: 10px;"></div>
+                      
+                    <!-- Requirements Block -->
+                    <div style="color: white; font-size: 15px; margin-top: 5px; gap: 5px; text-align: center; display: flex; flex-direction: column; align-items: center;">
+                        <div style="margin-bottom: 5px;">Chassis recovery requires 4 repairs.</div>
+
+                        <!-- Refresh + Data Aligned Below + Buttons as Unified Block -->
+                        <div style="display: flex; flex-direction: column; align-items: stretch; width: 100%; gap: 10px;">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 15px;">
+
+                                <!-- Refresh Button Left-Aligned -->
+                                <button id="refreshAlliedRepairs" class="lancer-button lancer-secondary" style="padding: 2px; font-size: 18px; width: 30px; height: 55px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="mdi mdi-refresh" style="margin-left: 3px;"></i>
+                                </button>
+
+                                <!-- Data Block -->
+                                <div style="display: flex; flex-direction: column; justify-content: space-between; text-align: left; width: 100%;">
+                                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                                        <span>Repairs available:</span>
+                                        <span id="ownedRepairsCount" style="text-align: right;">${repairsValue}</span>
                                     </div>
+                                    <div style="display: flex; justify-content: space-between; margin-top: 3px">
+                                        <span>Ally repairs detected:</span>
+                                        <span style="text-align: right;" id="alliedRepairsCount">${alliedRepairs}</span>
+                                    </div>
+ 
+                                    <div style="display: flex; justify-content: space-between; margin-top: 3px;">
+                                        <span>Additional required:</span>
+                                        <span style="text-align: right;" id="repairsRequiredCount">${repairsRequired}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            
+                            <!-- Confirm and Cancel Buttons -->                            
+                            <div style="display: flex; flex-direction: column; gap: 5px; width: 100%;">
+                                <button id="confirmReinit" class="lancer-button lancer-secondary">Confirm</button>
+                                <button id="cancelReinit" class="lancer-button lancer-secondary">Cancel</button>
+
+                            <div style="height: 10px;"></div>
+                                
                             </div>
                         </div>
-
-
-                <!-- Confirm and Cancel Buttons -->
-                <div style="text-align: right; margin-top: 20px;">
-                    <button id="confirmReinit" class="lancer-button ${totalAvailableRepairs < 4 ? 'lancer-secondary-highlight' : 'lancer-secondary'}" ${totalAvailableRepairs < 4 ? 'disabled' : ''}>Confirm</button>
-                    <button id="cancelReinit" class="lancer-button lancer-secondary">Cancel</button>
-                </div>
-            </div>
+                    </div>
         `;
 
         // Render the reinitialization dialog
@@ -169,16 +198,19 @@ async function openPilotWindow(pilot) {
                 toggleReinitButtonState(); // Run toggle check initially
             
                     // Refresh button handler
-                html.find('#refreshAlliedRepairs').click(async () => {
-                    alliedRepairs = await getAlliedRepairs();
-                    totalAvailableRepairs = repairsValue + alliedRepairs;
-                    repairsRequired = 4 - alliedRepairs;
+                    html.find('#refreshAlliedRepairs').click(async () => {
+                        alliedRepairs = await getAlliedRepairs();
+                        repairsValue = mech.system.repairs.value; // Refresh own repairs too
+                        totalAvailableRepairs = repairsValue + alliedRepairs;
+                        repairsRequired = Math.max(0, 4 - repairsValue - alliedRepairs);
                     
                     // Update the allied repairs display and button state
-                    html.find('#alliedRepairsCount').text(alliedRepairs);
-                    html.find('#repairsRequiredCount').text(repairsRequired);
-                    toggleReinitButtonState();
-                });
+                        html.find('#alliedRepairsCount').text(alliedRepairs);
+                        html.find('#repairsRequiredCount').text(repairsRequired);
+                        html.find('#ownedRepairsCount').text(`${repairsValue} / ${maxRepairs}`);
+                    
+                        toggleReinitButtonState();
+                    });
         
                 reinitButton.click(async () => {
                     // Set mech stats to reinitialized values
